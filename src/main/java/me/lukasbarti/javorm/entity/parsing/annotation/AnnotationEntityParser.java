@@ -1,9 +1,11 @@
-package me.lukasbarti.javorm.entity.parser.annotation;
+package me.lukasbarti.javorm.entity.parsing.annotation;
 
 import me.lukasbarti.javorm.entity.DatabaseEntity;
-import me.lukasbarti.javorm.entity.parser.EntityMetadata;
-import me.lukasbarti.javorm.entity.parser.EntityParser;
-import me.lukasbarti.javorm.mapping.BasicFieldMapping;
+import me.lukasbarti.javorm.entity.parsing.EntityMetadata;
+import me.lukasbarti.javorm.entity.parsing.EntityParser;
+import me.lukasbarti.javorm.mapping.basic.BasicFieldMapping;
+import me.lukasbarti.javorm.mapping.external.OneToOne;
+import me.lukasbarti.javorm.mapping.external.OneToOneFieldMapping;
 
 import java.lang.reflect.Field;
 
@@ -18,13 +20,13 @@ public class AnnotationEntityParser implements EntityParser {
         }
 
         for (Field field : databaseEntity.getFields()) {
-            if (field.getAnnotations().length == 0 || field.isAnnotationPresent(Key.class)) {
+            if(field.isAnnotationPresent(OneToOne.class)) {
+                metadata.mappings.add(new OneToOneFieldMapping(field.getName(), field.getType(), field.getAnnotation(OneToOne.class)));
+            } else {
                 if(field.isAnnotationPresent(Key.class)) {
                     metadata.primaryKey = field.getName();
                 }
                 metadata.mappings.add(new BasicFieldMapping(field.getName(), field.getType()));
-            } else {
-                System.out.println("No mapping for: " + databaseEntity.getName() + "." + field.getName());
             }
         }
 

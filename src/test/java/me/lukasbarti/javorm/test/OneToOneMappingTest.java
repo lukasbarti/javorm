@@ -5,6 +5,7 @@ import me.lukasbarti.javorm.entity.DatabaseEntity;
 import me.lukasbarti.javorm.entity.parsing.annotation.AnnotationEntityParser;
 import me.lukasbarti.javorm.entity.parsing.annotation.Key;
 import me.lukasbarti.javorm.entity.parsing.annotation.Table;
+import me.lukasbarti.javorm.mapping.external.OneToOne;
 import me.lukasbarti.javorm.typing.TypeConverters;
 import org.junit.jupiter.api.*;
 
@@ -13,7 +14,7 @@ import java.sql.DriverManager;
 import java.util.Properties;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class BasicFunctionalityTest {
+public class OneToOneMappingTest {
 
     private Connection connection;
     private Javorm javorm;
@@ -26,7 +27,8 @@ public class BasicFunctionalityTest {
         this.connection = DriverManager.getConnection(properties.getProperty("connection_string"));
         this.javorm = Javorm.forConnection(connection, new AnnotationEntityParser(), new TypeConverters().withDefaults());
 
-        javorm.parseEntity(TestEntity.class);
+        javorm.parseEntity(Book.class);
+        javorm.parseEntity(Author.class);
     }
 
     @AfterAll
@@ -36,26 +38,30 @@ public class BasicFunctionalityTest {
     }
 
     @Test
-    public void testBasicMappingWithNativeStatement() throws Exception {
-        var entity = javorm.getEntity(TestEntity.class, "SELECT * FROM test_entities;");
+    public void testOneToOneMapping() throws Exception {
+        var book = this.javorm.getEntity(Book.class, "SELECT * FROM test_books;");
 
-        Assertions.assertNotNull(entity);
-        System.out.println("Test entity (native): " + entity.test);
+        Assertions.assertNotNull(book);
+
+        System.out.println("Author of the book: " + book.author.name);
     }
 
-    @Test
-    public void testBasicMappingWithKey() throws Exception {
-        var entity = javorm.getEntityByKey(TestEntity.class, 1);
-
-        Assertions.assertNotNull(entity);
-        System.out.println("Test entity (parsed with key): " + entity.test);
-    }
-
-    @Table("test_entities")
-    public static class TestEntity implements DatabaseEntity {
+    @Table("test_books")
+    public static class Book implements DatabaseEntity {
         @Key
         public int id;
-        public String test;
+        public String title;
+        @OneToOne(mappedBy = "_author_id")
+        public Author author;
     }
+
+    @Table("test_authors")
+    public static class Author implements DatabaseEntity {
+        @Key
+        public int id;
+
+        public String name;
+    }
+
 
 }
