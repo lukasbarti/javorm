@@ -4,6 +4,8 @@ import me.lukasbarti.javorm.entity.DatabaseEntity;
 import me.lukasbarti.javorm.entity.parsing.EntityMetadata;
 import me.lukasbarti.javorm.entity.parsing.EntityParser;
 import me.lukasbarti.javorm.mapping.basic.BasicFieldMapping;
+import me.lukasbarti.javorm.mapping.external.OneToMany;
+import me.lukasbarti.javorm.mapping.external.OneToManyFieldMapping;
 import me.lukasbarti.javorm.mapping.external.OneToOne;
 import me.lukasbarti.javorm.mapping.external.OneToOneFieldMapping;
 
@@ -20,10 +22,12 @@ public class AnnotationEntityParser implements EntityParser {
         }
 
         for (Field field : databaseEntity.getFields()) {
-            if(field.isAnnotationPresent(OneToOne.class)) {
+            if (field.isAnnotationPresent(OneToOne.class)) {
                 metadata.mappings.add(new OneToOneFieldMapping(field.getName(), field.getType(), field.getAnnotation(OneToOne.class)));
+            } else if (field.isAnnotationPresent(OneToMany.class)) {
+                metadata.mappings.add(new OneToManyFieldMapping(field.getName(), field.getType(), field.getAnnotation(OneToMany.class)));
             } else {
-                if(field.isAnnotationPresent(Key.class)) {
+                if (field.isAnnotationPresent(Key.class)) {
                     metadata.primaryKey = field.getName();
                 }
                 metadata.mappings.add(new BasicFieldMapping(field.getName(), field.getType()));

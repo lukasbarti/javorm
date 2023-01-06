@@ -50,12 +50,7 @@ public class Javorm {
         var statement = this.prepareStatementWithParameters(query, parameters);
         statement.executeQuery();
 
-        var resultSet = statement.executeQuery();
-
-        if(!resultSet.next())
-            throw new NoSuchElementException("No results could be found for query: \"" + query + "\".");
-
-        return resultSet;
+        return statement.executeQuery();
     }
 
     private <T> PropertyMap<T> executeEntityMappings(Class<T> entityClass, ResultSet resultSet) throws Exception {
@@ -71,16 +66,13 @@ public class Javorm {
     }
 
     public <T> T getEntity(Class<T> entityClass, String query, Object... parameters) throws Exception {
-        if(!this.entityMetadataMap.containsKey(entityClass))
-            throw new UnsupportedOperationException("Entity with class " + entityClass.getName() + " has not been parsed yet.");
+        var entities = this.getEntities(entityClass, query, parameters);
 
-        var resultSet = this.executeStatementWithParameters(query, parameters);
-        var properties = this.executeEntityMappings(entityClass, resultSet);
+        if(entities.size() >= 1) {
+            return entities.get(0);
+        }
 
-        var object = entityClass.getConstructor().newInstance();
-        properties.applyPropertiesToObject(object);
-
-        return object;
+        throw new NoSuchElementException("No results could be found for the query: " + query + ".");
     }
 
     public <T> T getEntityWithCondition(Class<T> entityClass, String condition, Object... parameters) throws Exception {
@@ -104,6 +96,39 @@ public class Javorm {
 
         return this.getEntityWithCondition(entityClass, metadata.primaryKey + " = ?", key);
     }
+
+    public <T> List<T> getEntities(Class<T> entityClass, String query, Object... parameters) throws Exception {
+        if(!this.entityMetadataMap.containsKey(entityClass))
+            throw new UnsupportedOperationException("Entity with class " + entityClass.getName() + " has not been parsed yet.");
+
+        var resultSet = this.executeStatementWithParameters(query, parameters);
+
+        var entities = new ArrayList<T>();
+
+        while(resultSet.next()) {
+            var properties = this.executeEntityMappings(entityClass, resultSet);
+            var object = entityClass.getConstructor().newInstance();
+
+            properties.applyPropertiesToObject(object);
+
+            entities.add(object);
+        }
+
+        return entities;
+    }
+
+    public <T> List<T> getEntitiesWithCondition(Class<T> entityClass, String condition, Object... parameters) throws Exception {
+        if(!this.entityMetadataMap.containsKey(entityClass))
+            throw new UnsupportedOperationException("Entity with class " + entityClass.getName() + " has not been parsed yet.");
+
+        var metadata = this.entityMetadataMap.get(entityClass);
+        if(metadata.tableName == null)
+            throw new UnsupportedOperationException("Entity with class " + entityClass.getName() + " has does not possess a table name.");
+
+        return this.getEntities(entityClass, "SELECT * FROM " + metadata.tableName + " WHERE " + condition + ";", parameters);
+    }
+
+
 
     public static Javorm forConnection(Connection connection, EntityParser entityParser, TypeConverters typeConverters) {
         return new Javorm(connection, entityParser, typeConverters);
