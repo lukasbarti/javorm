@@ -1,17 +1,16 @@
-package me.lukasbarti.javorm.entity.parser;
+package me.lukasbarti.javorm.entity.parsing;
 
 import me.lukasbarti.javorm.mapping.FieldMapping;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class EntityMetadata {
 
     public String tableName;
     public String primaryKey;
-    public Set<FieldMapping> mappings;
+    public List<FieldMapping> mappings;
 
     public EntityMetadata() {
-        this.mappings = new HashSet<>();
+        this.mappings = new ArrayList<>();
     }
 }

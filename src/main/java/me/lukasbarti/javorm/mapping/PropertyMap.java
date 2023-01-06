@@ -1,10 +1,8 @@
 package me.lukasbarti.javorm.mapping;
 
-import me.lukasbarti.javorm.entity.DatabaseEntity;
-
 import java.util.HashMap;
 
-public class PropertyMap<T extends DatabaseEntity> extends HashMap<String, Object> {
+public class PropertyMap<T> extends HashMap<String, Object> {
 
     private final Class<T> typeClass;
 
@@ -20,7 +18,7 @@ public class PropertyMap<T extends DatabaseEntity> extends HashMap<String, Objec
         }
     }
 
-    public static <T extends DatabaseEntity> PropertyMap<T> createPropertyMapForEntity(Class<T> entityClass) {
+    public static <T> PropertyMap<T> createPropertyMapForEntity(Class<T> entityClass) {
         return new PropertyMap<>(entityClass);
     }
 

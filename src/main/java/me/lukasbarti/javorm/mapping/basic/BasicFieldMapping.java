@@ -1,6 +1,8 @@
-package me.lukasbarti.javorm.mapping;
+package me.lukasbarti.javorm.mapping.basic;
 
 import me.lukasbarti.javorm.Javorm;
+import me.lukasbarti.javorm.mapping.FieldMapping;
+import me.lukasbarti.javorm.mapping.PropertyMap;
 import me.lukasbarti.javorm.typing.TypeConverters;
 
 import java.sql.ResultSet;
@@ -16,6 +18,11 @@ public class BasicFieldMapping extends FieldMapping {
         var result = resultSet.getObject(this.fieldName);
 
         return typeConverters.convertToType(this.targetType, result);
+    }
+
+    @Override
+    public int getPriority() {
+        return 0;
     }
 
 }

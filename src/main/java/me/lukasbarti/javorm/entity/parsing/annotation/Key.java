@@ -1,11 +1,8 @@
-package me.lukasbarti.javorm.entity.parser.annotation;
+package me.lukasbarti.javorm.entity.parsing.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Table {
-
-    String value();
-
+public @interface Key {
 }

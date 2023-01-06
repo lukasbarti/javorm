@@ -3,8 +3,8 @@ package me.lukasbarti.javorm;
 import me.lukasbarti.javorm.entity.DatabaseEntity;
 import me.lukasbarti.javorm.mapping.FieldMapping;
 import me.lukasbarti.javorm.mapping.PropertyMap;
-import me.lukasbarti.javorm.entity.parser.EntityMetadata;
-import me.lukasbarti.javorm.entity.parser.EntityParser;
+import me.lukasbarti.javorm.entity.parsing.EntityMetadata;
+import me.lukasbarti.javorm.entity.parsing.EntityParser;
 import me.lukasbarti.javorm.typing.TypeConverters;
 
 import java.sql.Connection;
@@ -29,7 +29,10 @@ public class Javorm {
     }
 
     public Javorm parseEntity(Class<? extends DatabaseEntity> entityClass) {
-        entityMetadataMap.put(entityClass, entityParser.parseEntity(entityClass));
+        var parsedEntity = entityParser.parseEntity(entityClass);
+        parsedEntity.mappings.sort(Comparator.comparingInt(FieldMapping::getPriority));
+
+        entityMetadataMap.put(entityClass, parsedEntity);
 
         return this;
     }
@@ -55,7 +58,7 @@ public class Javorm {
         return resultSet;
     }
 
-    private <T extends DatabaseEntity> PropertyMap<T> executeEntityMappings(Class<T> entityClass, ResultSet resultSet) throws Exception {
+    private <T> PropertyMap<T> executeEntityMappings(Class<T> entityClass, ResultSet resultSet) throws Exception {
         var properties = PropertyMap.createPropertyMapForEntity(entityClass);
         var entityMetadata = entityMetadataMap.get(entityClass);
         for (FieldMapping entityMapping : entityMetadata.mappings) {
@@ -67,7 +70,7 @@ public class Javorm {
         return properties;
     }
 
-    public <T extends DatabaseEntity> T getEntity(Class<T> entityClass, String query, Object... parameters) throws Exception {
+    public <T> T getEntity(Class<T> entityClass, String query, Object... parameters) throws Exception {
         if(!entityMetadataMap.containsKey(entityClass))
             throw new UnsupportedOperationException("Entity with class " + entityClass.getName() + " has not been parsed yet.");
 
@@ -80,15 +83,26 @@ public class Javorm {
         return object;
     }
 
-    public <T extends DatabaseEntity> T getEntityByKey(Class<T> entityClass, Object key) throws Exception {
+    public <T> T getEntityWithCondition(Class<T> entityClass, String condition, Object... parameters) throws Exception {
         if(!entityMetadataMap.containsKey(entityClass))
             throw new UnsupportedOperationException("Entity with class " + entityClass.getName() + " has not been parsed yet.");
 
         var metadata = this.entityMetadataMap.get(entityClass);
-        if(metadata.primaryKey == null || metadata.tableName == null)
-            throw new UnsupportedOperationException("Entity with class " + entityClass.getName() + " has does not possess either a table name or a key.");
+        if(metadata.tableName == null)
+            throw new UnsupportedOperationException("Entity with class " + entityClass.getName() + " has does not possess a table name.");
 
-        return this.getEntity(entityClass, "SELECT * FROM " + metadata.tableName + " WHERE " + metadata.primaryKey + " = ?;", key);
+        return this.getEntity(entityClass, "SELECT * FROM " + metadata.tableName + " WHERE " + condition + ";", parameters);
+    }
+
+    public <T> T getEntityByKey(Class<T> entityClass, Object key) throws Exception {
+        if(!entityMetadataMap.containsKey(entityClass))
+            throw new UnsupportedOperationException("Entity with class " + entityClass.getName() + " has not been parsed yet.");
+
+        var metadata = this.entityMetadataMap.get(entityClass);
+        if(metadata.primaryKey == null)
+            throw new UnsupportedOperationException("Entity with class " + entityClass.getName() + " has does not possess a key.");
+
+        return this.getEntityWithCondition(entityClass, metadata.primaryKey + " = ?", key);
     }
 
     public static Javorm forConnection(Connection connection, EntityParser entityParser, TypeConverters typeConverters) {
