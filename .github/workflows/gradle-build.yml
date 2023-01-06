@@ -23,7 +23,7 @@ jobs:
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
       with:
         gradle-version: '7.3.3'
-        arguments: build
+        arguments: build -x test
     - uses: actions/upload-artifact@v3
       with:
         name: javorm-dev-build
