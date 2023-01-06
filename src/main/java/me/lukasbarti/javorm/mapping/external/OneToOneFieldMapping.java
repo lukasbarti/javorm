@@ -19,10 +19,10 @@ public class OneToOneFieldMapping extends FieldMapping {
 
     @Override
     public Object mapForEntity(Javorm instance, ResultSet resultSet, PropertyMap<?> propertyMap, TypeConverters typeConverters) throws Exception {
-        if("".equals(annotation.targetColumn())) {
-            return instance.getEntityByKey(targetType, resultSet.getObject(annotation.mappedBy()));
+        if("".equals(this.annotation.targetColumn())) {
+            return instance.getEntityByKey(this.targetType, resultSet.getObject(this.annotation.mappedBy()));
         } else {
-            return instance.getEntityWithCondition(targetType, annotation.targetColumn() + " = ?",resultSet.getObject(annotation.mappedBy()));
+            return instance.getEntityWithCondition(this.targetType, this.annotation.targetColumn() + " = ?",resultSet.getObject(this.annotation.mappedBy()));
         }
 
     }

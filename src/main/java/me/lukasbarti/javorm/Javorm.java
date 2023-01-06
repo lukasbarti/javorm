@@ -29,16 +29,16 @@ public class Javorm {
     }
 
     public Javorm parseEntity(Class<? extends DatabaseEntity> entityClass) {
-        var parsedEntity = entityParser.parseEntity(entityClass);
+        var parsedEntity = this.entityParser.parseEntity(entityClass);
         parsedEntity.mappings.sort(Comparator.comparingInt(FieldMapping::getPriority));
 
-        entityMetadataMap.put(entityClass, parsedEntity);
+        this.entityMetadataMap.put(entityClass, parsedEntity);
 
         return this;
     }
 
     private PreparedStatement prepareStatementWithParameters(String query, Object... parameters) throws SQLException {
-        var statement = connection.prepareStatement(query);
+        var statement = this.connection.prepareStatement(query);
         for (int i = 0; i < parameters.length; i++) {
             statement.setObject(i + 1, parameters[i]);
         }
@@ -60,9 +60,9 @@ public class Javorm {
 
     private <T> PropertyMap<T> executeEntityMappings(Class<T> entityClass, ResultSet resultSet) throws Exception {
         var properties = PropertyMap.createPropertyMapForEntity(entityClass);
-        var entityMetadata = entityMetadataMap.get(entityClass);
+        var entityMetadata = this.entityMetadataMap.get(entityClass);
         for (FieldMapping entityMapping : entityMetadata.mappings) {
-            var mappedValue = entityMapping.mapForEntity(this, resultSet, properties, typeConverters);
+            var mappedValue = entityMapping.mapForEntity(this, resultSet, properties, this.typeConverters);
 
             properties.put(entityMapping.fieldName(), mappedValue);
         }
@@ -71,7 +71,7 @@ public class Javorm {
     }
 
     public <T> T getEntity(Class<T> entityClass, String query, Object... parameters) throws Exception {
-        if(!entityMetadataMap.containsKey(entityClass))
+        if(!this.entityMetadataMap.containsKey(entityClass))
             throw new UnsupportedOperationException("Entity with class " + entityClass.getName() + " has not been parsed yet.");
 
         var resultSet = this.executeStatementWithParameters(query, parameters);
@@ -84,7 +84,7 @@ public class Javorm {
     }
 
     public <T> T getEntityWithCondition(Class<T> entityClass, String condition, Object... parameters) throws Exception {
-        if(!entityMetadataMap.containsKey(entityClass))
+        if(!this.entityMetadataMap.containsKey(entityClass))
             throw new UnsupportedOperationException("Entity with class " + entityClass.getName() + " has not been parsed yet.");
 
         var metadata = this.entityMetadataMap.get(entityClass);
@@ -95,7 +95,7 @@ public class Javorm {
     }
 
     public <T> T getEntityByKey(Class<T> entityClass, Object key) throws Exception {
-        if(!entityMetadataMap.containsKey(entityClass))
+        if(!this.entityMetadataMap.containsKey(entityClass))
             throw new UnsupportedOperationException("Entity with class " + entityClass.getName() + " has not been parsed yet.");
 
         var metadata = this.entityMetadataMap.get(entityClass);

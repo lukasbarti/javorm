@@ -23,16 +23,16 @@ public class OneToOneMappingTest {
         properties.load(BasicMappingTest.class.getResourceAsStream("/database.properties"));
 
         this.connection = DriverManager.getConnection(properties.getProperty("connection_string"));
-        this.javorm = Javorm.forConnection(connection, new AnnotationEntityParser(), new TypeConverters().withDefaults());
+        this.javorm = Javorm.forConnection(this.connection, new AnnotationEntityParser(), new TypeConverters().withDefaults());
 
-        javorm.parseEntity(Book.class);
-        javorm.parseEntity(Author.class);
+        this.javorm.parseEntity(Book.class);
+        this.javorm.parseEntity(Author.class);
     }
 
     @AfterAll
     public void tearDown() throws Exception {
-        if (connection != null)
-            connection.close();
+        if (this.connection != null)
+            this.connection.close();
     }
 
     @Test
