@@ -1,11 +1,9 @@
 package me.lukasbarti.javorm.test;
 
 import me.lukasbarti.javorm.Javorm;
-import me.lukasbarti.javorm.entity.DatabaseEntity;
 import me.lukasbarti.javorm.entity.parsing.annotation.AnnotationEntityParser;
-import me.lukasbarti.javorm.entity.parsing.annotation.Key;
-import me.lukasbarti.javorm.entity.parsing.annotation.Table;
-import me.lukasbarti.javorm.mapping.external.OneToOne;
+import me.lukasbarti.javorm.test.entity.Author;
+import me.lukasbarti.javorm.test.entity.Book;
 import me.lukasbarti.javorm.typing.TypeConverters;
 import org.junit.jupiter.api.*;
 
@@ -22,7 +20,7 @@ public class OneToOneMappingTest {
     @BeforeAll
     public void setUp() throws Exception {
         var properties = new Properties();
-        properties.load(BasicFunctionalityTest.class.getResourceAsStream("/database.properties"));
+        properties.load(BasicMappingTest.class.getResourceAsStream("/database.properties"));
 
         this.connection = DriverManager.getConnection(properties.getProperty("connection_string"));
         this.javorm = Javorm.forConnection(connection, new AnnotationEntityParser(), new TypeConverters().withDefaults());
@@ -43,24 +41,8 @@ public class OneToOneMappingTest {
 
         Assertions.assertNotNull(book);
 
-        System.out.println("Author of the book: " + book.author.name);
-    }
-
-    @Table("test_books")
-    public static class Book implements DatabaseEntity {
-        @Key
-        public int id;
-        public String title;
-        @OneToOne(mappedBy = "_author_id")
-        public Author author;
-    }
-
-    @Table("test_authors")
-    public static class Author implements DatabaseEntity {
-        @Key
-        public int id;
-
-        public String name;
+        System.out.println("Example book (fetched with statement): " + book.title);
+        System.out.println("  -> Author: " + book.author.name);
     }
 
 
