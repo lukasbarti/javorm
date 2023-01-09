@@ -1,7 +1,6 @@
 package me.lukasbarti.javorm.mapping;
 
 import me.lukasbarti.javorm.Javorm;
-import me.lukasbarti.javorm.mapping.PropertyMap;
 import me.lukasbarti.javorm.typing.TypeConverters;
 
 import java.sql.ResultSet;

@@ -6,8 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OneToMany {
 
-    String mappedBy();
+    String source();
     Class<?> type();
-    String targetColumn();
+    String target();
 
 }
