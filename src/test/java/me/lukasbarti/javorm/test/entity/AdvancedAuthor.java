@@ -6,7 +6,7 @@ import java.util.List;
 
 public class AdvancedAuthor extends Author {
 
-    @OneToMany(mappedBy = "id", targetColumn = "_author_id", type = Book.class)
+    @OneToMany(source = "id", target = "_author_id", type = Book.class)
     public List<Book> books;
 
 }

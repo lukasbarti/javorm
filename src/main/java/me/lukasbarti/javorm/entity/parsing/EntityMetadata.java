@@ -7,7 +7,7 @@ import java.util.*;
 public class EntityMetadata {
 
     public String tableName;
-    public String primaryKey;
+    public String key;
     public List<FieldMapping> mappings;
 
     public EntityMetadata() {

@@ -28,7 +28,7 @@ public class AnnotationEntityParser implements EntityParser {
                 metadata.mappings.add(new OneToManyFieldMapping(field.getName(), field.getType(), field.getAnnotation(OneToMany.class)));
             } else {
                 if (field.isAnnotationPresent(Key.class)) {
-                    metadata.primaryKey = field.getName();
+                    metadata.key = field.getName();
                 }
                 metadata.mappings.add(new BasicFieldMapping(field.getName(), field.getType()));
             }

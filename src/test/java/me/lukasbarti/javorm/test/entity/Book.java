@@ -12,6 +12,6 @@ public class Book implements DatabaseEntity {
 
     public String title;
 
-    @OneToOne(mappedBy = "_author_id")
+    @OneToOne(source = "_author_id")
     public Author author;
 }
