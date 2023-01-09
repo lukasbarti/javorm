@@ -23,20 +23,20 @@ public class BasicMappingTest {
         properties.load(BasicMappingTest.class.getResourceAsStream("/database.properties"));
 
         this.connection = DriverManager.getConnection(properties.getProperty("connection_string"));
-        this.javorm = Javorm.forConnection(connection, new AnnotationEntityParser(), new TypeConverters().withDefaults());
+        this.javorm = Javorm.forConnection(this.connection, new AnnotationEntityParser(), new TypeConverters().withDefaults());
 
-        javorm.parseEntity(Author.class);
+        this.javorm.parseEntity(Author.class);
     }
 
     @AfterAll
     public void tearDown() throws Exception {
-        if (connection != null)
-            connection.close();
+        if (this.connection != null)
+            this.connection.close();
     }
 
     @Test
     public void testBasicMappingWithSQLStatement() throws Exception {
-        var author = javorm.getEntity(Author.class, "SELECT * FROM test_authors;");
+        var author = this.javorm.getEntity(Author.class, "SELECT * FROM test_authors;");
 
         Assertions.assertNotNull(author);
         System.out.println("Example author (fetched with statement): " + author.name);
@@ -44,7 +44,7 @@ public class BasicMappingTest {
 
     @Test
     public void testBasicMappingWithKey() throws Exception {
-        var author = javorm.getEntityByKey(Author.class, 1);
+        var author = this.javorm.getEntityByKey(Author.class, 1);
 
         Assertions.assertNotNull(author);
         System.out.println("Example author (fetched with key):" + author.name);

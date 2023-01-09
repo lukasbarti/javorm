@@ -17,7 +17,7 @@ public abstract class FieldMapping {
     }
 
     public String fieldName() {
-        return fieldName;
+        return this.fieldName;
     }
 
     public abstract Object mapForEntity(Javorm instance, ResultSet resultSet, PropertyMap<?> propertyMap, TypeConverters typeConverters) throws Exception;

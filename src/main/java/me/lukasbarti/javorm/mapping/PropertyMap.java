@@ -12,7 +12,7 @@ public class PropertyMap<T> extends HashMap<String, Object> {
 
     public void applyPropertiesToObject(T object) throws ReflectiveOperationException {
         for (String fieldName : this.keySet()) {
-            var field = typeClass.getField(fieldName);
+            var field = this.typeClass.getField(fieldName);
 
             field.set(object, this.get(fieldName));
         }

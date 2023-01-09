@@ -2,6 +2,7 @@ package me.lukasbarti.javorm.test;
 
 import me.lukasbarti.javorm.Javorm;
 import me.lukasbarti.javorm.entity.parsing.annotation.AnnotationEntityParser;
+import me.lukasbarti.javorm.test.entity.AdvancedAuthor;
 import me.lukasbarti.javorm.test.entity.Author;
 import me.lukasbarti.javorm.test.entity.Book;
 import me.lukasbarti.javorm.typing.TypeConverters;
@@ -12,7 +13,7 @@ import java.sql.DriverManager;
 import java.util.Properties;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class OneToOneMappingTest {
+public class OneToManyMappingTest {
 
     private Connection connection;
     private Javorm javorm;
@@ -27,6 +28,7 @@ public class OneToOneMappingTest {
 
         this.javorm.parseEntity(Book.class);
         this.javorm.parseEntity(Author.class);
+        this.javorm.parseEntity(AdvancedAuthor.class);
     }
 
     @AfterAll
@@ -36,14 +38,16 @@ public class OneToOneMappingTest {
     }
 
     @Test
-    public void testOneToOneMapping() throws Exception {
-        var book = this.javorm.getEntity(Book.class, "SELECT * FROM test_books;");
+    public void testOneToManyMapping() throws Exception {
+        var author = this.javorm.getEntity(AdvancedAuthor.class, "SELECT * FROM test_authors;");
 
-        Assertions.assertNotNull(book);
+        Assertions.assertNotNull(author);
 
-        System.out.println("Example book (fetched with statement): " + book.title);
-        System.out.println("  -> Author: " + book.author.name);
+        System.out.println("Example author (fetched with statement): " + author.name);
+        for (int i = 0; i < author.books.size(); i++) {
+            System.out.println("  -> Book " + i + ": " + author.books.get(i).title);
+        }
+
     }
-
 
 }

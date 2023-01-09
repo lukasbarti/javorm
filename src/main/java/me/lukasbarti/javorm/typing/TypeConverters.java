@@ -14,18 +14,18 @@ public class TypeConverters {
     }
 
     public <T> TypeConverters addConverter(Class<T> typeClass, TypeConverter<T> converter) {
-        converterMap.put(typeClass, converter);
+        this.converterMap.put(typeClass, converter);
         return this;
     }
 
     public TypeConverters withDefaults() {
-        converterMap.put(String.class, new CastConverter<>());
-        converterMap.put(int.class, new CastConverter<>());
-        converterMap.put(long.class, new CastConverter<>());
-        converterMap.put(double.class, new CastConverter<>());
-        converterMap.put(float.class, new CastConverter<>());
-        converterMap.put(boolean.class, new CastConverter<>());
-        converterMap.put(Date.class, object -> {
+        this.converterMap.put(String.class, new CastConverter<>());
+        this.converterMap.put(int.class, new CastConverter<>());
+        this.converterMap.put(long.class, new CastConverter<>());
+        this.converterMap.put(double.class, new CastConverter<>());
+        this.converterMap.put(float.class, new CastConverter<>());
+        this.converterMap.put(boolean.class, new CastConverter<>());
+        this.converterMap.put(Date.class, object -> {
             java.sql.Date date = (java.sql.Date) object;
             return new Date(date.getTime());
         });
@@ -34,8 +34,8 @@ public class TypeConverters {
 
     @SuppressWarnings("unchecked")
     public <T> T convertToType(Class<T> typeClass, Object object) throws NoSuchElementException {
-        if (converterMap.containsKey(typeClass))
-            return (T) converterMap.get(typeClass).convert(object);
+        if (this.converterMap.containsKey(typeClass))
+            return (T) this.converterMap.get(typeClass).convert(object);
 
         throw new NoSuchElementException("No type conversion for class " + typeClass.getName() + " could be found.");
     }
